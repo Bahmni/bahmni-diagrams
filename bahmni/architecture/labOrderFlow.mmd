@@ -1,0 +1,27 @@
+  sequenceDiagram
+      actor Clinician
+      participant BahmniWeb as Bahmni Web
+      participant OpenMRS
+      participant AF_OMRS as Atomfeed (OpenMRS DB)
+      participant OpenELIS
+      actor LabTech as Lab Technician
+
+      Clinician->>BahmniWeb: Create lab order
+      BahmniWeb->>OpenMRS: POST /ws/rest/v1/order
+      OpenMRS->>AF_OMRS: Publish lab order event
+
+      OpenELIS->>AF_OMRS: Poll for new events
+      AF_OMRS-->>OpenELIS: Lab order event
+      OpenELIS->>OpenELIS: Add order to lab queue
+
+      LabTech->>OpenELIS: View & process sample
+      LabTech->>OpenELIS: Enter results
+      OpenELIS->>OpenELIS: Publish result to its own Atomfeed
+
+      OpenMRS->>OpenELIS: Poll OpenELIS Atomfeed
+      OpenELIS-->>OpenMRS: Lab result event
+      OpenMRS->>OpenMRS: Store observation/result
+
+      Clinician->>BahmniWeb: View results
+      BahmniWeb->>OpenMRS: GET /ws/rest/v1/obs
+      OpenMRS-->>Clinician: Lab results displayed

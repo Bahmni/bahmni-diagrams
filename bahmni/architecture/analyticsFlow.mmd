@@ -1,0 +1,13 @@
+  sequenceDiagram
+      participant BahmniMart as Bahmni Mart (cron every 15min)
+      participant OMRS_DB as OpenMRS DB
+      participant MartDB as Mart DB
+      participant Metabase
+      actor Analyst
+
+      BahmniMart->>OMRS_DB: Read raw clinical data
+      BahmniMart->>MartDB: Write flattened/denormalized tables
+
+      Analyst->>Metabase: Open dashboard
+      Metabase->>MartDB: SQL queries
+      Metabase-->>Analyst: Charts & dashboards

@@ -1,0 +1,14 @@
+sequenceDiagram
+      actor User
+      participant BahmniWeb as Bahmni Web
+      participant Reports as Reports Service
+      participant OMRS_DB as OpenMRS DB
+      participant ELIS_DB as OpenELIS DB
+      participant Odoo_DB as Odoo DB
+
+      User->>BahmniWeb: Open Reports module
+      BahmniWeb->>Reports: GET report request
+      Reports->>OMRS_DB: SQL — clinical data
+      Reports->>ELIS_DB: SQL — lab data
+      Reports->>Odoo_DB: SQL — billing data
+      Reports-->>User: Compiled report

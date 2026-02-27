@@ -1,0 +1,14 @@
+ sequenceDiagram
+      actor Patient
+      participant Appointments as Appointments Module
+      participant OpenMRS
+      participant SMS as SMS Service
+      participant Provider as External SMS Provider
+
+      Patient->>Appointments: Book appointment
+      Appointments->>OpenMRS: POST appointment
+
+      SMS->>OpenMRS: Poll — GET upcoming appointments
+      OpenMRS-->>SMS: Appointment + patient phone data
+      SMS->>Provider: HTTPS POST — send SMS
+      Provider-->>Patient: SMS notification
