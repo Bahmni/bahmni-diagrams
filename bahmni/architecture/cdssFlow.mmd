@@ -1,0 +1,13 @@
+  sequenceDiagram
+      actor Clinician
+      participant OpenMRS
+      participant CDSS as CDSS Service
+      participant Snowstorm as Snowstorm Lite (SNOMED-CT)
+
+      Clinician->>OpenMRS: Enter medication prescription
+      OpenMRS->>CDSS: REST — drug codes + patient conditions
+      CDSS->>Snowstorm: FHIR terminology lookup (SNOMED concepts)
+      Snowstorm-->>CDSS: Concept details
+      CDSS->>CDSS: Apply rule sheets (drug-drug, drug-condition)
+      CDSS-->>OpenMRS: Alerts / contraindication cards
+      OpenMRS-->>Clinician: Show warning in UI

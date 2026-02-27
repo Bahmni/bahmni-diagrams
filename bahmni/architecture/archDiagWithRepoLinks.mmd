@@ -1,0 +1,106 @@
+  flowchart TD                                                                                                                                                                    
+      classDef user fill:#ECF0F1,stroke:#95A5A6,color:#2C3E50                                                                                                                     
+      classDef frontend fill:#2980B9,stroke:#1A5276,color:#fff                                                                                                                    
+      classDef emr fill:#1E8449,stroke:#145A32,color:#fff                                                                                                                         
+      classDef lab fill:#CA6F1E,stroke:#935116,color:#fff                                                                                                                         
+      classDef erp fill:#7D3C98,stroke:#5B2C6F,color:#fff
+      classDef pacs fill:#117A65,stroke:#0E6655,color:#fff
+      classDef cdss fill:#B7950B,stroke:#9A7D0A,color:#fff
+      classDef sms fill:#CB4335,stroke:#922B21,color:#fff
+      classDef analytics fill:#1A252F,stroke:#0D1B2A,color:#fff
+      classDef monitoring fill:#616A6B,stroke:#424949,color:#fff
+
+      User(["Clinician / Staff"]):::user
+
+      subgraph FRONTEND["  Frontend  "]
+          BahmniWeb["Bahmni Web (Angular)<br/>github: openmrs-module-bahmniapps"]:::frontend
+          BahmniFE["Bahmni Apps Frontend (React)<br/>github: bahmni-apps-frontend"]:::frontend
+      end
+
+      subgraph CORE["  Core EMR  "]
+          OpenMRS["OpenMRS Distro<br/>github: openmrs-distro-bahmni"]:::emr
+          BahmniCore["Bahmni Core<br/>github: bahmni-core"]:::emr
+      end
+
+      subgraph LAB_LAYER["  Lab  "]
+          OpenELIS["OpenELIS<br/>github: OpenElis"]:::lab
+      end
+
+      subgraph ERP_LAYER["  ERP / Billing  "]
+          OdooConnect["Odoo Connect<br/>github: openerp-atomfeed-service"]:::erp
+          Odoo["Odoo<br/>github: bahmni-odoo-modules"]:::erp
+      end
+
+      subgraph PACS_LAYER["  Radiology / PACS  "]
+          PACSInteg["PACS Integration<br/>github: pacs-integration"]:::pacs
+          DCM4CHEE["DCM4CHEE<br/>Imaging Server"]:::pacs
+      end
+
+      subgraph CDS_LAYER["  Clinical Decision Support  "]
+          CDSS["CDSS<br/>github: openmrs-module-cdss"]:::cdss
+          Snowstorm["Snowstorm Lite  SNOMED-CT<br/>github: IHTSDO/snowstorm-lite"]:::cdss
+      end
+
+      subgraph ANALYTICS_LAYER["  Reporting & Analytics  "]
+          Reports["Reports<br/>github: bahmni-reports"]:::analytics
+          Metabase["Metabase<br/>github: bahmni-metabase"]:::analytics
+      end
+
+      SMS["SMS Service<br/>github: sms-service"]:::sms
+      AtomfeedConsole["Atomfeed Console<br/>Event Monitoring"]:::monitoring
+
+      RadDevice(["Radiology Device"]):::user
+      Patient(["Patient Phone"]):::user
+
+      User --> BahmniWeb
+      User --> BahmniFE
+      BahmniWeb -->|"REST / FHIR"| OpenMRS
+      BahmniFE -->|"REST / FHIR"| OpenMRS
+      BahmniCore -->|"OpenMRS modules"| OpenMRS
+
+      OpenMRS <-->|"Atomfeed"| OpenELIS
+
+      OpenMRS -->|"Atomfeed"| OdooConnect
+      OdooConnect <-->|"REST"| Odoo
+
+      OpenMRS -->|"Atomfeed"| PACSInteg
+      PACSInteg -->|"DICOM"| DCM4CHEE
+      DCM4CHEE <-->|"DICOM"| RadDevice
+
+      OpenMRS -->|"FHIR"| CDSS
+      CDSS -->|"FHIR"| Snowstorm
+
+      OpenMRS -->|"REST"| SMS
+      SMS --> Patient
+
+      OpenMRS -->|"Direct DB"| Reports
+      OpenELIS -->|"Direct DB"| Reports
+      Odoo -->|"Direct DB"| Reports
+      Reports --> Metabase
+
+      AtomfeedConsole -. "monitors" .-> OpenMRS
+      AtomfeedConsole -. "monitors" .-> OpenELIS
+      AtomfeedConsole -. "monitors" .-> Odoo
+      AtomfeedConsole -. "monitors" .-> PACSInteg
+
+      click BahmniWeb "https://github.com/Bahmni/openmrs-module-bahmniapps" _blank
+      click BahmniFE "https://github.com/Bahmni/bahmni-apps-frontend" _blank
+      click OpenMRS "https://github.com/Bahmni/openmrs-distro-bahmni" _blank
+      click BahmniCore "https://github.com/Bahmni/bahmni-core" _blank
+      click OpenELIS "https://github.com/Bahmni/OpenElis" _blank
+      click OdooConnect "https://github.com/Bahmni/openerp-atomfeed-service" _blank
+      click Odoo "https://github.com/Bahmni/bahmni-odoo-modules" _blank
+      click PACSInteg "https://github.com/Bahmni/pacs-integration" _blank
+      click CDSS "https://github.com/Bahmni/openmrs-module-cdss" _blank
+      click Snowstorm "https://github.com/IHTSDO/snowstorm-lite" _blank
+      click SMS "https://github.com/Bahmni/sms-service" _blank
+      click Reports "https://github.com/Bahmni/bahmni-reports" _blank
+      click Metabase "https://github.com/Bahmni/bahmni-metabase" _blank
+
+      style FRONTEND fill:#D6EAF8,stroke:#2980B9
+      style CORE fill:#D5F5E3,stroke:#1E8449
+      style LAB_LAYER fill:#FDEBD0,stroke:#CA6F1E
+      style ERP_LAYER fill:#E8DAEF,stroke:#7D3C98
+      style PACS_LAYER fill:#D1F2EB,stroke:#117A65
+      style CDS_LAYER fill:#FEF9E7,stroke:#B7950B
+      style ANALYTICS_LAYER fill:#D5D8DC,stroke:#1A252F

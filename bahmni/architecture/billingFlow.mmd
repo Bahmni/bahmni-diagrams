@@ -1,0 +1,21 @@
+sequenceDiagram
+      participant OpenMRS
+      participant OpenELIS
+      participant OdooConnect as Odoo Connect
+      participant Odoo
+      actor Staff as Billing Staff
+
+      Note over OpenMRS,OdooConnect: Patient & Visit Sync
+      OpenMRS->>OdooConnect: Atomfeed: patient/visit/order events
+      OdooConnect->>Odoo: REST API — create/update patient, sale order
+
+      Note over OpenELIS,OdooConnect: Lab Test Catalog Sync
+      OpenELIS->>OdooConnect: Atomfeed: test catalog events
+      OdooConnect->>Odoo: REST API — sync lab test products
+
+      Note over Odoo,OpenMRS: Drug/Product Catalog Sync
+      Odoo->>OdooConnect: Atomfeed: drug/product events
+      OdooConnect->>OpenMRS: REST API — sync drug concepts
+
+      Staff->>Odoo: Generate invoice for patient visit
+      Odoo-->>Staff: Invoice created

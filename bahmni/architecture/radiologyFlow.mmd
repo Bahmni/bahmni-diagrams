@@ -1,0 +1,25 @@
+sequenceDiagram
+      actor Clinician
+      participant OpenMRS
+      participant AF_OMRS as Atomfeed (OpenMRS DB)
+      participant PACSInteg as PACS Integration
+      participant DCM4CHEE as DCM4CHEE (DICOM)
+      participant Device as Radiology Device
+      actor RadTech as Radiology Tech
+
+      Clinician->>OpenMRS: Create radiology order
+      OpenMRS->>AF_OMRS: Publish radiology order event
+
+      PACSInteg->>AF_OMRS: Poll events
+      AF_OMRS-->>PACSInteg: Radiology order
+      PACSInteg->>DCM4CHEE: Create Modality Worklist entry (HL7 MWL)
+
+      RadTech->>Device: Select patient from worklist
+      Device->>DCM4CHEE: C-FIND worklist query
+      DCM4CHEE-->>Device: Patient/procedure info
+      RadTech->>Device: Perform scan
+      Device->>DCM4CHEE: C-STORE DICOM image (:11112)
+
+      Clinician->>OpenMRS: View radiology result
+      OpenMRS-->>Clinician: Redirect to PACS viewer (:8055)
+      DCM4CHEE-->>Clinician: DICOM image viewer
